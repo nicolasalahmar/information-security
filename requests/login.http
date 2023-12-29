@@ -1,0 +1,7 @@
+POST http://127.0.0.1:8000/university/api/login/
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "12345678"
+}
