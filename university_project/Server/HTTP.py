@@ -1,6 +1,5 @@
 import json
 from io import BytesIO
-from urllib.parse import urlencode
 
 from university_project.Server.http_request_parser import http_request_parser
 
