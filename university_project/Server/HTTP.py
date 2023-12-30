@@ -13,8 +13,10 @@ def execute_django(application, request, client_socket, host_port):
         'PATH_INFO': request.url,
         'SERVER_NAME': host_port[0],
         'SERVER_PORT': host_port[1],
-        'CONTENT_LENGTH': str(len(request.body))
     }
+
+    for key, value in request.headers.items():
+        environ[f'HTTP_{key}'] = value
 
     if request.method == 'POST':
         post_data_bytes = json.dumps(request.body).encode('utf-8')
