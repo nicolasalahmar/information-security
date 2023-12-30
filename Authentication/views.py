@@ -1,15 +1,17 @@
+import base64
 import json
 
+from Crypto.Cipher import PKCS1_OAEP
+from Crypto.PublicKey import RSA
 from rest_framework import generics
 
 from .enc import encrypt, decrypt
+from university_project.Server.confidentiality_tools import generate_server_keys
 from .serializers import UserSerializer
 from .models import User
-from rest_framework.decorators import authentication_classes, permission_classes, api_view
+from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from django.utils.decorators import method_decorator
 
 
 class UserSignUpView(generics.CreateAPIView):
@@ -40,3 +42,33 @@ def complete_sign_up(request):
     cipher_text = encrypt(res, request.user.national_id)
 
     return Response(cipher_text, status=200)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def key_exchange(request):
+    private_key, public_key = generate_server_keys()
+
+    request.user.private_key = private_key.decode('utf-8')
+    request.user.public_key = json.loads(request.body.decode('utf-8')).get("public_key")
+
+    request.user.save()
+
+    response = {
+        "server_public_key": public_key
+    }
+    return Response(response, status=200)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def send_session_key(request):
+    encrypted_session_key = json.loads(request.body.decode('utf-8')).get("encrypted_session_key")
+    encrypted_session_key = base64.b64decode(encrypted_session_key)
+
+    private_key = RSA.import_key(request.user.private_key)
+    cipher = PKCS1_OAEP.new(private_key)
+    decrypted_session_key = cipher.decrypt(encrypted_session_key).decode()
+
+    encrypt('', decrypted_session_key)
+    return Response(decrypted_session_key, status=200)

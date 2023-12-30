@@ -1,16 +1,16 @@
 import http.client
 
 from university_project.Client.login import login
-
 from university_project.Client.sign_up import sign_up as su
 
 
 def sign_up(host_port):
     sign_up_creds = {
-        "name": "admin6",
+        "name": "admin7",
         "password": "12345678",
         "university": "1",
-        "role": "s"
+        "role": "s",
+        "national_id":"1234567890"
     }
 
     res = su(host_port, sign_up_creds)
@@ -28,7 +28,7 @@ def main():
     if not sign_up(host_port):
         return
 
-    token = login(host_port, {"username": "admin6", "password": "12345678"})
+    token = login(host_port, {"username": "admin7", "password": "12345678"})
     if token is None:
         print('Login failed')
         return
