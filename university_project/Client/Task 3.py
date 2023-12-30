@@ -4,6 +4,7 @@ import json
 import secrets
 import string
 
+import os
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
 from university_project.Client.confidentiality_tools import generate_client_keys
