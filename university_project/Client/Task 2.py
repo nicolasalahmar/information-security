@@ -11,7 +11,7 @@ def complete_info():
 
     national_id = '1234567890'
 
-    token = login(host_port, {"username": "admin", "password": "12345678"})
+    token = login(host_port, {"username": "admin7", "password": "12345678"})
     if token is None:
         print('Login failed')
         return
