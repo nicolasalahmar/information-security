@@ -15,6 +15,10 @@ class User(AbstractBaseUser):
     name = models.CharField(max_length=100, unique=True)
     university = models.ForeignKey(University, on_delete=models.CASCADE)
     role = models.CharField(max_length=20, choices=Roles.choices, default='', null=False, blank=True)
+    national_id = models.CharField(max_length=100, unique=True, null=True, default=None)
+    phone = models.CharField(max_length=100, null=True, default=None)
+    mobile = models.CharField(max_length=100, null=True, default=None)
+    address = models.CharField(max_length=100, null=True, default=None)
 
     objects = UserManager()
 

@@ -18,7 +18,10 @@ def execute_django(application, request, client_socket, host_port):
         environ[f'HTTP_{key}'] = value
 
     if request.method == 'POST':
-        post_data_bytes = json.dumps(request.body).encode('utf-8')
+        if isinstance(request.body, dict):
+            post_data_bytes = json.dumps(request.body).encode('utf-8')
+        else:
+            post_data_bytes = request.body
         post_data_io = BytesIO(post_data_bytes)
         environ['CONTENT_LENGTH'] = str(len(post_data_bytes))
         environ['CONTENT_TYPE'] = 'application/json'
