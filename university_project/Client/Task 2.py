@@ -2,16 +2,16 @@ import http.client
 import json
 
 from Authentication.enc import encrypt, decrypt
-from university_project.Client.login import login
+from university_project.Client.request_templates.login import login
 
 
 def complete_info():
     host, port = '127.0.0.1', 8000
     host_port = f'{host}:{port}'
 
-    national_id = '12345664999'
+    national_id = '1234567890'
 
-    token = login(host_port, {"username": "admin13", "password": "12345678"})
+    token = login({"username": "admin7", "password": "12345678"})
     if token is None:
         print('Login failed')
         return

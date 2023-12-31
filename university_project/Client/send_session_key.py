@@ -2,7 +2,7 @@ import http.client
 import json
 
 
-def send_session_key_to_server(url,body):
+def send_session_key_to_server(url, body):
     conn = http.client.HTTPConnection(url)
 
     token = body.get('token')

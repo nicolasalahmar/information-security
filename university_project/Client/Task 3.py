@@ -4,7 +4,7 @@ from Crypto.Cipher import AES
 
 from Authentication.enc import encrypt
 from university_project.Client.key_exchange import key_exchange
-from university_project.Client.login import login
+from university_project.Client.request_templates.login import login
 from university_project.Client.send_session_key import send_session_key_to_server
 import base64
 from university_project.Client.confidentiality_tools import generate_client_keys, generate_random_string, \
@@ -16,7 +16,7 @@ def achieve_confidentiality():
     host_port = f'{host}:{port}'
 
     # Authentication
-    token = login(host_port, {"username": "admin13", "password": "12345678"})
+    token = login({"username": "admin6", "password": "12345678"})
     if token is None:
         print('Login failed')
         return
