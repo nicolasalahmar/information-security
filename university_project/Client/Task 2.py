@@ -10,7 +10,7 @@ def complete_info(token):
     national_id = '1234567891'
 
     body = {
-        "phone": "1234567",
+        "phone": "0988311840",
         "mobile": "+96393123456789",
         "address": "Syria, Damascus, ..."
     }
@@ -25,7 +25,7 @@ def complete_info(token):
 
 def main():
 
-    token = login({"username": "admin1", "password": "12345678"})
+    token = login({"username": "twfek", "password": "kaneki ken"})
     if token is None:
         print('Login failed')
         return

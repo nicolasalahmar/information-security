@@ -1,12 +1,12 @@
 import base64
-from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad, unpad
-from Crypto.Random import get_random_bytes
+from Cryptodome.Cipher import AES
+from Cryptodome.Util.Padding import pad, unpad
+from Cryptodome.Random import get_random_bytes
 
 
 def decrypt(ciphertext, key):
     if len(key) < 16:
-        key = key + (16 - len(key))*'x'
+        key = key + (16 - len(key)) * 'x'
 
     byte_literal = key.encode('utf-8')
     cipher = AES.new(byte_literal, AES.MODE_ECB)
@@ -17,7 +17,7 @@ def decrypt(ciphertext, key):
 
 def encrypt(plaintext, key):
     if len(key) < 16:
-        key = key + (16 - len(key))*'x'
+        key = key + (16 - len(key)) * 'x'
 
     byte_literal = key.encode('utf-8')
     cipher = AES.new(byte_literal, AES.MODE_ECB)

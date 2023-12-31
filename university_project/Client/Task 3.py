@@ -1,6 +1,6 @@
 import http
 import json
-from Crypto.Cipher import AES
+from Cryptodome.Cipher import AES
 
 from Authentication.enc import encrypt
 from university_project.Client.key_exchange import key_exchange

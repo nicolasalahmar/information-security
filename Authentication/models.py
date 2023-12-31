@@ -7,6 +7,7 @@ class ServerKeys(models.Model):
     server_public_key = models.CharField(max_length=10000, null=True, default=None)
     server_private_key = models.CharField(max_length=10000, null=True, default=None)
 
+
 class University(models.Model):
     name = models.CharField(max_length=100)
 
@@ -29,4 +30,3 @@ class User(AbstractBaseUser):
     objects = UserManager()
 
     USERNAME_FIELD = 'name'
-

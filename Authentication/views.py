@@ -1,8 +1,8 @@
 import base64
 import json
 
-from Crypto.Cipher import PKCS1_OAEP, AES
-from Crypto.PublicKey import RSA
+from Cryptodome.Cipher import AES, PKCS1_OAEP
+from Cryptodome.PublicKey import RSA
 from rest_framework import generics
 
 from .enc import encrypt, decrypt
@@ -77,5 +77,5 @@ def send_projects(request):
     body = decrypt(cipher_body, request.user.session_key)
     body = json.loads(body)
 
-    print("Project Received Successfully : ",body)
+    print("Project Received Successfully : ", body)
     return Response("Projects Received", status=200)
