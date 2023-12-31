@@ -8,7 +8,7 @@ from rest_framework import generics
 from .enc import encrypt, decrypt
 from university_project.Server.confidentiality_tools import generate_server_keys
 from .serializers import UserSerializer
-from .models import User
+from .models import User, ServerKeys
 from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -47,10 +47,9 @@ def complete_sign_up(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def key_exchange(request):
-    server_private_key, server_public_key = generate_server_keys()
+    server_public_key = ServerKeys.objects.first().server_public_key
 
-    request.user.private_key = server_private_key.decode('utf-8')
-    request.user.public_key = json.loads(request.body.decode('utf-8')).get("client_public_key")
+    request.user.client_public_key = json.loads(request.body.decode('utf-8')).get("client_public_key")
     request.user.save()
 
     return Response(server_public_key, status=200)
@@ -62,9 +61,21 @@ def receive_session_key_from_client(request):
     encrypted_session_key = json.loads(request.body.decode('utf-8')).get("encrypted_session_key")
     encrypted_session_key = base64.b64decode(encrypted_session_key)
 
-    private_key = RSA.import_key(request.user.private_key)
+    private_key = RSA.import_key(ServerKeys.objects.first().server_private_key)
     cipher = PKCS1_OAEP.new(private_key)
     decrypted_session_key = cipher.decrypt(encrypted_session_key).decode()
+    request.user.session_key = decrypted_session_key
+    request.user.save()
 
-    
     return Response("Session Key Accepted", status=200)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def send_projects(request):
+    cipher_body = request.body.decode('utf-8')
+    body = decrypt(cipher_body, request.user.session_key)
+    body = json.loads(body)
+
+    print("Project Received Successfully : ",body)
+    return Response("Projects Received", status=200)

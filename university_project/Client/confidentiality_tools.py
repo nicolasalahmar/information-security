@@ -16,10 +16,9 @@ def generate_client_keys():
 
 
 def generate_random_string(length):
-    characters = string.ascii_letters + string.digits + string.punctuation
+    characters = string.digits
     random_string = ''.join(secrets.choice(characters) for _ in range(length))
     return random_string
-
 
 def get_session_key_encrypted(server_public_key, session_key):
     server_public_key = RSA.import_key(server_public_key)

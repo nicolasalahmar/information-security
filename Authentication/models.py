@@ -3,6 +3,10 @@ from django.contrib.auth.models import UserManager
 from django.db import models
 
 
+class ServerKeys(models.Model):
+    server_public_key = models.CharField(max_length=10000, null=True, default=None)
+    server_private_key = models.CharField(max_length=10000, null=True, default=None)
+
 class University(models.Model):
     name = models.CharField(max_length=100)
 
@@ -19,8 +23,8 @@ class User(AbstractBaseUser):
     phone = models.CharField(max_length=100, null=True, default=None)
     mobile = models.CharField(max_length=100, null=True, default=None)
     address = models.CharField(max_length=100, null=True, default=None)
-    public_key = models.CharField(max_length=10000, null=True, default=None)
-    private_key = models.CharField(max_length=10000, null=True, default=None)
+    client_public_key = models.CharField(max_length=10000, null=True, default=None)
+    session_key = models.CharField(max_length=10000, null=True, default=None)
 
     objects = UserManager()
 

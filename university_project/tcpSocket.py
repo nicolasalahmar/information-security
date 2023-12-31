@@ -2,11 +2,12 @@ import os
 import socket
 import sys
 import threading
-
 import colorama
 import select
 from Server.HTTP import serve_requests
 from university_project.wsgi import get_wsgi_application
+from university_project.Server.confidentiality_tools import generate_server_keys
+from Authentication.models import ServerKeys
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'university_project.settings')
 application = get_wsgi_application()
@@ -46,6 +47,9 @@ def server_loop(server_socket, host, port):
 def main():
     host = '127.0.0.1'
     port = 8000
+
+    if not ServerKeys.objects.exists():
+        generate_server_keys()
 
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((host, port))

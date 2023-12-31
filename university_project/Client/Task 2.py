@@ -9,9 +9,9 @@ def complete_info():
     host, port = '127.0.0.1', 8000
     host_port = f'{host}:{port}'
 
-    national_id = '1234567890'
+    national_id = '12345664999'
 
-    token = login(host_port, {"username": "admin7", "password": "12345678"})
+    token = login(host_port, {"username": "admin13", "password": "12345678"})
     if token is None:
         print('Login failed')
         return

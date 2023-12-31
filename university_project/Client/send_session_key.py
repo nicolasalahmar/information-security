@@ -12,7 +12,7 @@ def send_session_key_to_server(url,body):
     response = conn.getresponse()
     response_body = response.read().decode('utf-8')
     response_body = json.loads(response_body)
-
+    print(response_body)
     if response.status == 200:
         conn.close()
         return response_body
