@@ -10,4 +10,4 @@ class POST(Call):
     def __init__(self, path, headers, body):
         super().__init__(path, headers)
         self.method = 'POST'
-        self.body = json.dumps(body).encode()
+        self.body = body.encode()
