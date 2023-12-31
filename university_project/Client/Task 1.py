@@ -6,11 +6,11 @@ from university_project.Client.sign_up import sign_up as su
 
 def sign_up(host_port):
     sign_up_creds = {
-        "name": "admin7",
+        "name": "admin9",
         "password": "12345678",
         "university": "1",
         "role": "s",
-        "national_id":"1234567890"
+        "national_id":"1234567891"
     }
 
     res = su(host_port, sign_up_creds)
@@ -28,7 +28,7 @@ def main():
     if not sign_up(host_port):
         return
 
-    token = login(host_port, {"username": "admin7", "password": "12345678"})
+    token = login(host_port, {"username": "admin9", "password": "12345678"})
     if token is None:
         print('Login failed')
         return

@@ -1,7 +1,7 @@
 import base64
 import json
 
-from Crypto.Cipher import PKCS1_OAEP
+from Crypto.Cipher import PKCS1_OAEP, AES
 from Crypto.PublicKey import RSA
 from rest_framework import generics
 
@@ -47,22 +47,18 @@ def complete_sign_up(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def key_exchange(request):
-    private_key, public_key = generate_server_keys()
+    server_private_key, server_public_key = generate_server_keys()
 
-    request.user.private_key = private_key.decode('utf-8')
-    request.user.public_key = json.loads(request.body.decode('utf-8')).get("public_key")
-
+    request.user.private_key = server_private_key.decode('utf-8')
+    request.user.public_key = json.loads(request.body.decode('utf-8')).get("client_public_key")
     request.user.save()
 
-    response = {
-        "server_public_key": public_key
-    }
-    return Response(response, status=200)
+    return Response(server_public_key, status=200)
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def send_session_key(request):
+def receive_session_key_from_client(request):
     encrypted_session_key = json.loads(request.body.decode('utf-8')).get("encrypted_session_key")
     encrypted_session_key = base64.b64decode(encrypted_session_key)
 
@@ -70,5 +66,5 @@ def send_session_key(request):
     cipher = PKCS1_OAEP.new(private_key)
     decrypted_session_key = cipher.decrypt(encrypted_session_key).decode()
 
-    encrypt('', decrypted_session_key)
-    return Response(decrypted_session_key, status=200)
+    
+    return Response("Session Key Accepted", status=200)
