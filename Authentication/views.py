@@ -1,22 +1,20 @@
 # Core
 import base64
 import json
-from Cryptodome.Cipher import AES, PKCS1_OAEP
-from Cryptodome.PublicKey import RSA
+
 from rest_framework import generics
 from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 # Dev
-from .enc import encrypt, decrypt
-from university_project.Server.confidentiality_tools import generate_server_keys
 from .serializers import UserSerializer
 from .models import User, ServerKeys
 from encryption.symmetric.AES import AESEncryption
 from encryption.symmetric.key_generator import generateIv
-from encryption.asymmetric.key_pair_generator import importPrivateKey , exportPublicKey
+from encryption.asymmetric.key_pair_generator import importPrivateKey, exportPublicKey, importPublicKey
 from encryption.asymmetric.RSA import RSAEncryption
+from encryption.digital_signature.DigitalSignature import DigitalSignature
 
 class UserSignUpView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -106,9 +104,91 @@ def receive_session_key_from_client(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def send_projects(request):
-    cipher_body = request.body.decode('utf-8')
-    body = decrypt(cipher_body, request.user.session_key)
-    body = json.loads(body)
+    body = json.loads(request.body.decode('utf-8'))
 
-    print("Project Received Successfully : ", body)
-    return Response("Projects Received", status=200)
+    # get the keys and data
+    iv = body.get('iv')
+    encrypted_data = body.get('encrypted_data')
+    session_key = request.user.session_key
+
+    # decrypt the data
+    decrypted_data = AESEncryption.decrypt(encrypted_data, session_key, iv)
+    decrypted_data = json.loads(decrypted_data)
+
+    print("Project Received Successfully : ", decrypted_data)
+
+    # encrypt the message
+    message = "send project completed successfully"
+    iv = generateIv()
+    encrypted_message = AESEncryption.encrypt(message, session_key, iv)
+
+    res = {
+        "iv": iv,
+        "encrypted_message": encrypted_message
+    }
+
+    return Response(json.dumps(res), status=200)
+
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def send_marks(request):
+    body = json.loads(request.body.decode('utf-8'))
+
+    # get the keys and data
+    iv = body.get('iv')
+    encrypted_data = body.get('encrypted_data')
+    digital_signature = body.get('digital_signature')
+    session_key = request.user.session_key
+    client_pubic_key = request.user.client_public_key
+    client_pubic_key = importPublicKey(client_pubic_key.encode('utf-8'))
+
+    # verify role
+    role = request.user.role
+
+    if role != "d":
+        message = "unauthorized !!!"
+        iv = generateIv()
+        encrypted_message = AESEncryption.encrypt(message, session_key, iv)
+
+        res = {
+            "iv": iv,
+            "encrypted_message": encrypted_message
+        }
+
+        return Response(json.dumps(res), status=401)
+
+    # verify digital signature
+    verify_signature = DigitalSignature.verifyDigitalSignature(digital_signature, encrypted_data, client_pubic_key)
+
+    if not verify_signature:
+        message = "Wrong Digital Signature !!!"
+        iv = generateIv()
+        encrypted_message = AESEncryption.encrypt(message, session_key, iv)
+
+        res = {
+            "iv": iv,
+            "encrypted_message": encrypted_message
+        }
+
+        return Response(json.dumps(res), status=401)
+
+    # decrypt the data
+    decrypted_data = AESEncryption.decrypt(encrypted_data, session_key, iv)
+    decrypted_data = json.loads(decrypted_data)
+
+    print("Marks Received Successfully : ", decrypted_data)
+
+    # encrypt the message
+    message = "send marks completed successfully"
+    iv = generateIv()
+    encrypted_message = AESEncryption.encrypt(message, session_key, iv)
+
+    res = {
+        "iv": iv,
+        "encrypted_message": encrypted_message
+    }
+
+    return Response(json.dumps(res), status=200)
+

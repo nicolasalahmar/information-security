@@ -5,14 +5,14 @@ import base64
 
 # Dev
 from Authentication.enc import encrypt
-from university_project.Client.key_exchange import key_exchange
-from university_project.Client.request_templates.login import login
-from university_project.Client.send_session_key import send_session_key_to_server
 from university_project.Client.confidentiality_tools import generate_client_keys, generate_random_string, \
     get_session_key_encrypted
 from encryption.asymmetric.key_pair_generator import generateKeyPair, exportPrivateKey, exportPublicKey, importPublicKey
 from encryption.symmetric.key_generator import generateSessionKey
 from encryption.asymmetric.RSA import RSAEncryption
+from encryption.symmetric.key_generator import generateIv
+from encryption.symmetric.AES import AESEncryption
+from university_project.Client.request_templates.requests_functions import key_exchange, login, send_session_key_to_server, send_project
 
 
 def achieve_confidentiality():
@@ -69,21 +69,11 @@ def send_projects():
     return True
 
 
-# def main():
-#     send_projects()
-
-
-def handshaking():
+def handshaking(token):
     server_url = f'127.0.0.1:8000'
 
     # generate client private/public keys
     client_private_key = generateKeyPair()
-
-    # get the token from the file
-    file = open("./client_info/task1_info.txt", "r")
-    lines = file.readlines()
-    token = lines[1].split(":")[1].strip()
-    file.close()
 
     # save private key in the client info
     file = open("./client_info/task3_client_private_key.txt", "w")
@@ -107,6 +97,8 @@ def handshaking():
     if status != 200:
         print("exchange public keys Incomplete!!!")
         return
+
+    print("The exchange public key completed successfully" + "\n")
 
     # get the server public key & save it in the client file
     res = json.loads(res)
@@ -143,13 +135,53 @@ def handshaking():
     file.writelines([("session_key:" + session_key + "\n")])
     file.close()
 
-    print(res)
+    print(res + "\n")
 
     return session_key
 
 
+def sendProject(session_key, token):
+    server_url = f'127.0.0.1:8000'
+
+    # initiate the project info
+    body = {
+        "name": "project 3",
+        "description": "lorem epsom.."
+    }
+
+    # generate IV to encrypt data than mac from encrypted_data
+    iv = generateIv()
+    encrypted_data = AESEncryption.encrypt(json.dumps(body), session_key, iv)
+
+    # call the complete signUp function to start connection with the socket
+    res, status = send_project(
+        server_url,
+        headers={
+            "Content-Type": "application/json",
+            "AUTHORIZATION": f"Token {token}"
+        },
+        body={
+            "iv": iv,
+            "encrypted_data": encrypted_data
+        },
+    )
+
+    # decrypt the returned response
+    res = json.loads(res)
+    decrypted_message = AESEncryption.decrypt(res.get("encrypted_message"), session_key, res.get("iv"))
+
+    print(decrypted_message)
+
+
 def main():
-    session_key = handshaking()
+    # get the token from the file
+    file = open("./client_info/task1_info.txt", "r")
+    lines = file.readlines()
+    token = lines[1].split(":")[1].strip()
+    file.close()
+
+    session_key = handshaking(token)
+    sendProject(session_key, token)
 
 
 if __name__ == "__main__":

@@ -32,6 +32,6 @@ class DigitalSignature:
                 ),
                 hashes.SHA256()
             )
-            return True;
+            return True
         except:
             return False
