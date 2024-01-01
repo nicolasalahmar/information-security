@@ -6,6 +6,7 @@ from encryption.asymmetric.key_pair_generator import importPrivateKey
 from university_project.Client.request_templates.requests_functions import send_marks
 from encryption.digital_signature.DigitalSignature import DigitalSignature
 
+
 def main():
     server_url = f'127.0.0.1:8000'
 
@@ -27,6 +28,7 @@ def main():
     file.close()
     private_key = importPrivateKey(lines.encode('utf-8'))
 
+    # initiate students marks
     marks = {
         'jogo': '100',
         'Goku': '99'
@@ -58,7 +60,6 @@ def main():
     decrypted_message = AESEncryption.decrypt(res.get("encrypted_message"), session_key, res.get("iv"))
 
     print(decrypted_message)
-
 
 
 if __name__ == "__main__":

@@ -9,7 +9,7 @@ from rest_framework.response import Response
 
 # Dev
 from .serializers import UserSerializer
-from .models import User, ServerKeys
+from .models import User, ServerKeys, Marks
 from encryption.symmetric.AES import AESEncryption
 from encryption.symmetric.key_generator import generateIv
 from encryption.asymmetric.key_pair_generator import importPrivateKey, exportPublicKey, importPublicKey
@@ -136,10 +136,12 @@ def send_projects(request):
 def send_marks(request):
     body = json.loads(request.body.decode('utf-8'))
 
-    # get the keys and data
+    # get the iv and data from request
     iv = body.get('iv')
     encrypted_data = body.get('encrypted_data')
     digital_signature = body.get('digital_signature')
+
+    # get the session key and client public key from DB
     session_key = request.user.session_key
     client_pubic_key = request.user.client_public_key
     client_pubic_key = importPublicKey(client_pubic_key.encode('utf-8'))
@@ -147,7 +149,7 @@ def send_marks(request):
     # verify role
     role = request.user.role
 
-    if role != "d":
+    if role != "p":
         message = "unauthorized !!!"
         iv = generateIv()
         encrypted_message = AESEncryption.encrypt(message, session_key, iv)
@@ -174,6 +176,14 @@ def send_marks(request):
 
         return Response(json.dumps(res), status=401)
 
+    # save the data for Non-Repudiation
+    marks = Marks.objects.create(
+        user_id=request.user.id,
+        mark_list=encrypted_data,
+        digital_signature=digital_signature
+    )
+    marks.save()
+
     # decrypt the data
     decrypted_data = AESEncryption.decrypt(encrypted_data, session_key, iv)
     decrypted_data = json.loads(decrypted_data)
@@ -182,6 +192,7 @@ def send_marks(request):
 
     # encrypt the message
     message = "send marks completed successfully"
+
     iv = generateIv()
     encrypted_message = AESEncryption.encrypt(message, session_key, iv)
 
@@ -192,3 +203,17 @@ def send_marks(request):
 
     return Response(json.dumps(res), status=200)
 
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def send_csr(request):
+    body = request.body.decode('utf-8')
+    print(body)
+    body = json.loads(body)
+
+    # get the csr from request
+    csr = body.get('csr')
+
+    res={}
+
+    return Response(json.dumps(res), status=200)

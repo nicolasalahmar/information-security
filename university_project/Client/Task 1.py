@@ -1,6 +1,3 @@
-# Core
-import json
-
 # Dev
 from university_project.Client.request_templates.requests_functions import home, login, sign_up
 from encryption.symmetric.key_generator import generateAESKey

@@ -1,5 +1,4 @@
 # Core
-import http.client
 import json
 
 # Dev
@@ -7,7 +6,6 @@ from university_project.Client.request_templates.requests_functions import compl
 from encryption.symmetric.key_generator import generateIv
 from encryption.symmetric.AES import AESEncryption
 from encryption.mac.MAC import Mac
-
 
 
 def main():

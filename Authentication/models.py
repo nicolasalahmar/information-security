@@ -31,3 +31,9 @@ class User(AbstractBaseUser):
     objects = UserManager()
 
     USERNAME_FIELD = 'name'
+
+
+class Marks(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    mark_list = models.CharField(max_length=10000, null=True, default=None)
+    digital_signature = models.CharField(max_length=10000, null=True, default=None)

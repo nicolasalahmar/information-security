@@ -1,19 +1,37 @@
+# Core
+import datetime
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.x509.oid import NameOID
-import datetime
 
 
 class DigitalCertificate:
-    def generateCSR(identity, private_key):
+
+    @staticmethod
+    def generateCSR(name, private_key):
         # Create a CSR
-        csr = x509.CertificateSigningRequestBuilder().subject_name(x509.Name([
-            x509.NameAttribute(NameOID.SERIAL_NUMBER, identity),
-        ])).public_key(private_key.public_key()).sign(private_key, hashes.SHA256(), default_backend())
+        csr = x509.CertificateSigningRequestBuilder()
+
+        # add subject to the csr
+        csr = csr.subject_name(x509.Name([
+            x509.NameAttribute(NameOID.COMMON_NAME, name),
+        ]))
+
+        # add public key
+        csr = csr.add_extension(
+            x509.SubjectKeyIdentifier.from_public_key(private_key.public_key()),
+            critical=False
+        )
+
+        # sign the csr with private key
+        csr = csr.sign(
+            private_key, hashes.SHA256(), default_backend()
+        )
 
         return csr
 
+    @staticmethod
     def generateDigitalCertificate(csr, private_key):
         # Generate the CA certificate
         subject = issuer = x509.Name([
