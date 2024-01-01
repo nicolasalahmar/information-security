@@ -1,14 +1,18 @@
+# Core
 import http
 import json
-from Cryptodome.Cipher import AES
+import base64
 
+# Dev
 from Authentication.enc import encrypt
 from university_project.Client.key_exchange import key_exchange
 from university_project.Client.request_templates.login import login
 from university_project.Client.send_session_key import send_session_key_to_server
-import base64
 from university_project.Client.confidentiality_tools import generate_client_keys, generate_random_string, \
     get_session_key_encrypted
+from encryption.asymmetric.key_pair_generator import generateKeyPair, exportPrivateKey, exportPublicKey, importPublicKey
+from encryption.symmetric.key_generator import generateSessionKey
+from encryption.asymmetric.RSA import RSAEncryption
 
 
 def achieve_confidentiality():
@@ -55,18 +59,97 @@ def send_projects():
         "Project 2": "1234567",
     }
 
-    cipher_body = encrypt(json.dumps(body),  session_key.decode('utf-8'))
+    cipher_body = encrypt(json.dumps(body), session_key.decode('utf-8'))
     conn = http.client.HTTPConnection(host_port)
     headers = {"Content-Type": "application/json", "AUTHORIZATION": f"Token {token}"}
-    conn.request("POST", "/university/api/send_projects/", body=cipher_body.encode(),headers=headers)
+    conn.request("POST", "/university/api/send_projects/", body=cipher_body.encode(), headers=headers)
 
     response = conn.getresponse()
 
     return True
 
 
+# def main():
+#     send_projects()
+
+
+def handshaking():
+    server_url = f'127.0.0.1:8000'
+
+    # generate client private/public keys
+    client_private_key = generateKeyPair()
+
+    # get the token from the file
+    file = open("./client_info/task1_info.txt", "r")
+    lines = file.readlines()
+    token = lines[1].split(":")[1].strip()
+    file.close()
+
+    # save private key in the client info
+    file = open("./client_info/task3_client_private_key.txt", "w")
+    file.truncate()
+    file.writelines([exportPrivateKey(client_private_key).decode('utf-8')])
+    file.close()
+
+    # call the complete signUp function to start connection with the socket
+    res, status = key_exchange(
+        server_url,
+        headers={
+            "Content-Type": "application/json",
+            "AUTHORIZATION": f"Token {token}"
+        },
+        body={
+            "client_public_key": exportPublicKey(client_private_key.public_key()).decode('utf-8')
+        },
+    )
+
+    # check if the exchange public key success
+    if status != 200:
+        print("exchange public keys Incomplete!!!")
+        return
+
+    # get the server public key & save it in the client file
+    res = json.loads(res)
+    file = open("./client_info/task3_server_public_key.txt", "w")
+    file.truncate()
+    file.writelines([res.get("server_public_key")])
+    file.close()
+
+    # generate session key & encrypt with the server public key
+    session_key = generateSessionKey()
+    server_public_key = importPublicKey(res.get("server_public_key").encode('utf-8'))
+    encrypted_session_key = RSAEncryption.encrypt(session_key, server_public_key)
+
+    # call the send_session_key_to_server function to start connection with the socket
+    res, status = send_session_key_to_server(
+        server_url,
+        headers={
+            "Content-Type": "application/json",
+            "AUTHORIZATION": f"Token {token}"
+        },
+        body={
+            "encrypted_session_key": encrypted_session_key
+        },
+    )
+
+    # check if the
+    if status != 200:
+        print("session key acceptance Incomplete!!!")
+        return
+
+    # save the session key in the client file
+    file = open("./client_info/task3_session_key.txt", "w")
+    file.truncate()
+    file.writelines([("session_key:" + session_key + "\n")])
+    file.close()
+
+    print(res)
+
+    return session_key
+
+
 def main():
-    send_projects()
+    session_key = handshaking()
 
 
 if __name__ == "__main__":

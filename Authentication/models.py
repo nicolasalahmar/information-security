@@ -26,6 +26,7 @@ class User(AbstractBaseUser):
     address = models.CharField(max_length=100, null=True, default=None)
     client_public_key = models.CharField(max_length=10000, null=True, default=None)
     session_key = models.CharField(max_length=10000, null=True, default=None)
+    symmetric_key = models.CharField(max_length=10000, null=True, default=None)
 
     objects = UserManager()
 

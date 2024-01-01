@@ -1,18 +1,18 @@
+# Core
 import json
 
-from university_project.Client.API.GET import GET
+# Dev
+from university_project.Client.API.GET import (GET)
 
 
 def home(headers):
+    # start connection with the socket
     req = GET("/university/api/home/", headers)
 
+    # get the returned data
     response, status = req.get_response_content()
-
-    print("Response Status:", status)
-
     response = json.loads(response)
-    print("Response Body:", response)
 
+    # close connection and return the response
     req.close_connection()
-    return response
-
+    return response, status

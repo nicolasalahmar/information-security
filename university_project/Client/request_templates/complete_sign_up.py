@@ -1,18 +1,19 @@
+# Core
 import json
 
+# Dev
 from Authentication.enc import encrypt, decrypt
 from university_project.Client.API.POST import POST
 
 
-def complete_sign_up(headers, body, national_id):
-    body = json.dumps(body)
-    cipher_body = encrypt(body, national_id)
+def complete_sign_up(headers, body):
+    # start connection with the socket
+    req = POST("/university/api/complete_sign_up/", headers, json.dumps(body))
 
-    req = POST("/university/api/complete_sign_up/", headers, cipher_body)
-
+    # get the returned data
     response, status = req.get_response_content()
-    response = decrypt(response, national_id)
     response = json.loads(response)
 
+    # close connection and return the response
     req.close_connection()
     return response, status
