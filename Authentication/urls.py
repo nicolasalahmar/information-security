@@ -1,8 +1,12 @@
 from django.urls import path
 from rest_framework.authtoken.views import obtain_auth_token
 
-from .views import UserSignUpView, home, complete_sign_up, key_exchange, receive_session_key_from_client, send_projects, \
-    send_marks, send_csr, verify_csr, handshake_with_dc
+from .views_dir.Task1 import UserSignUpView, home
+from .views_dir.Task2 import complete_sign_up
+from .views_dir.Task3 import key_exchange, receive_session_key_from_client, send_projects
+from .views_dir.Task4 import send_marks
+from .views_dir.Task5 import send_csr, verify_csr, handshake_with_dc
+
 
 urlpatterns = [
     path('api/login/', obtain_auth_token, name='api_token_auth'),

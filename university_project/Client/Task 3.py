@@ -39,7 +39,7 @@ def handshaking(token):
         print("exchange public keys Incomplete!!!")
         return
 
-    print("The exchange public key completed successfully" + "\n")
+    print("Exchanging public keys completed successfully" + "\n")
 
     # get the server public key & save it in the client file
     res = json.loads(res)
