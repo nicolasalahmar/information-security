@@ -37,5 +37,7 @@ class User(AbstractBaseUser):
 
 class Marks(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    receive_date_time = models.DateTimeField(auto_now_add=True)
     mark_list = models.CharField(max_length=10000, null=True, default=None)
+    encrypted_mark_list = models.CharField(max_length=10000, null=True, default=None)
     digital_signature = models.CharField(max_length=10000, null=True, default=None)

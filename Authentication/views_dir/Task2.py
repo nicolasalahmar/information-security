@@ -17,7 +17,6 @@ def complete_sign_up(request):
 
     # get the keys and data
     iv = body.get('iv')
-    mac = body.get('mac')
     encrypted_data = body.get('encrypted_data')
     symmetric_key = request.user.symmetric_key
 

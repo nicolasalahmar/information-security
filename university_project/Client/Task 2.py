@@ -5,7 +5,6 @@ import json
 from university_project.Client.request_templates.requests_functions import complete_sign_up
 from encryption.symmetric.key_generator import generateIv
 from encryption.symmetric.AES import AESEncryption
-from encryption.mac.MAC import Mac
 
 
 def main():
@@ -26,7 +25,6 @@ def main():
     # generate IV to encrypt data than mac from encrypted_data
     iv = generateIv()
     encrypted_data = AESEncryption.encrypt(json.dumps(body), symmetric_key, iv)
-    mac = Mac.generateMac(symmetric_key, encrypted_data, iv)
 
     # call the complete signUp function to start connection with the socket
     res, status = complete_sign_up(
@@ -34,7 +32,6 @@ def main():
         body={
             "iv": iv,
             "encrypted_data": encrypted_data,
-            "mac": mac
         },
     )
 

@@ -58,19 +58,20 @@ def send_marks(request):
 
         return Response(json.dumps(res), status=401)
 
-    # save the data for Non-Repudiation
-    marks = Marks.objects.create(
-        user_id=request.user.id,
-        mark_list=encrypted_data,
-        digital_signature=digital_signature
-    )
-    marks.save()
-
     # decrypt the data
     decrypted_data = AESEncryption.decrypt(encrypted_data, session_key, iv)
     decrypted_data = json.loads(decrypted_data)
 
     print("Marks Received Successfully : ", decrypted_data)
+
+    # save the data for Non-Repudiation
+    marks = Marks.objects.create(
+        user_id=request.user.id,
+        mark_list=decrypted_data,
+        digital_signature=digital_signature,
+        encrypted_mark_list=encrypted_data
+    )
+    marks.save()
 
     # encrypt the message
     message = "send marks completed successfully"
