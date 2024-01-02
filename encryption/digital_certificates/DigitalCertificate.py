@@ -1,9 +1,13 @@
 # Core
 import datetime
-from cryptography import x509
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes
 from cryptography.x509.oid import NameOID
+from cryptography.exceptions import InvalidSignature
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.backends import default_backend
+from cryptography import x509
+import base64
+from encryption.asymmetric.key_pair_generator import exportPublicKey
 
 
 class DigitalCertificate:
@@ -30,6 +34,23 @@ class DigitalCertificate:
         )
 
         return csr
+
+    @staticmethod
+    def verifyCSR(csr):
+        # Get the public key from the CSR
+        public_key = csr.public_key()
+
+        # Verify the signature on the CSR
+        try:
+            public_key.verify(
+                csr.signature,
+                csr.tbs_certrequest_bytes,
+                padding.PKCS1v15(),
+                csr.signature_hash_algorithm
+            )
+            return True
+        except:
+            return False
 
     @staticmethod
     def generateDigitalCertificate(csr, private_key):
@@ -65,3 +86,16 @@ class DigitalCertificate:
         ).sign(private_key, hashes.SHA256())
 
         return signed_cert
+
+    @staticmethod
+    def verifyDigitalCertificate(digital_certificate , ca_public_key):
+        try:
+            ca_public_key.verify(
+                digital_certificate.signature,
+                digital_certificate.tbs_certificate_bytes,
+                padding.PKCS1v15(),
+                digital_certificate.signature_hash_algorithm,
+            )
+            return True
+        except:
+            return False

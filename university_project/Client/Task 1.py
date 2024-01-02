@@ -9,7 +9,7 @@ def main():
         "name": "Twfek Ajeneh",
         "password": "kaneki ken",
         "university": "1",
-        "role": "s",
+        "role": "p",
         "national_id": "11111112111"
     }
 

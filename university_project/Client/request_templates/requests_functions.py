@@ -157,3 +157,43 @@ def send_csr(url, headers, body):
     # close connection and return the response
     conn.close()
     return response_body, response.status
+
+
+def verify_csr(url, headers, body):
+    # start connection with the socket
+    conn = http.client.HTTPConnection(url)
+    conn.request(
+        "POST",
+        "/university/api/verify_csr/",
+        body=json.dumps(body),
+        headers=headers
+    )
+
+    # get the returned data
+    response = conn.getresponse()
+    response_body = response.read().decode('utf-8')
+    response_body = json.loads(response_body)
+
+    # close connection and return the response
+    conn.close()
+    return response_body, response.status
+
+
+def handshake_with_DC(url, headers, body):
+    # start connection with the socket
+    conn = http.client.HTTPConnection(url)
+    conn.request(
+        "POST",
+        "/university/api/handshake_with_dc/",
+        body=json.dumps(body),
+        headers=headers
+    )
+
+    # get the returned data
+    response = conn.getresponse()
+    response_body = response.read().decode('utf-8')
+    response_body = json.loads(response_body)
+
+    # close connection and return the response
+    conn.close()
+    return response_body, response.status

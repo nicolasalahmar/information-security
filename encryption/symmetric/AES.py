@@ -10,7 +10,7 @@ from encryption.utils import encode64, decode64
 
 class AESEncryption:
     @staticmethod
-    # params: data/string , key/string , iv/string => {ct/string , iv/string , mac/string}
+    # params: data/string , key/string , iv/string => {ct/string}
     def encrypt(data, key, iv):
         # convert key & iv to byte
         key = key.encode('utf-8')

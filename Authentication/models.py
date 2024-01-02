@@ -27,6 +27,8 @@ class User(AbstractBaseUser):
     client_public_key = models.CharField(max_length=10000, null=True, default=None)
     session_key = models.CharField(max_length=10000, null=True, default=None)
     symmetric_key = models.CharField(max_length=10000, null=True, default=None)
+    csr_request = models.CharField(max_length=10000, null=True, default=None)
+    csr_question_answer = models.CharField(max_length=10000, null=True, default=None)
 
     objects = UserManager()
 

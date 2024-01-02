@@ -18,7 +18,7 @@ keep_running = True
 def handle_request(client_socket, host_port):
     global keep_running
 
-    request_data = client_socket.recv(1024)
+    request_data = client_socket.recv(2048)
 
     serve_requests(client_socket, request_data, application, host_port)
 
